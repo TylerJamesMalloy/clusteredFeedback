@@ -1,7 +1,6 @@
-from pyibl import Agent, DelayedResponse
 from . import Bandit 
 
-class IBLAgent(Bandit):
+class HUCBAgent(Bandit):
     def choose(self,options):
         print(options)
     
