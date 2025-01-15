@@ -1,4 +1,3 @@
-from .Bandit import Bandit
 from .HIBL import HIBLAgent
 from .IBL import IBLAgent
 from .HRL import HRLAgent

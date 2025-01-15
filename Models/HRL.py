@@ -1,6 +1,4 @@
-from . import Bandit 
-
-class HRLAgent(Bandit):
+class HRLAgent():
     def choose(self,options):
         print(options)
     

@@ -1,6 +1,4 @@
-from . import Bandit 
-
-class UCBAgent(Bandit):
+class UCBAgent():
     def choose(self,options):
         print(options)
     

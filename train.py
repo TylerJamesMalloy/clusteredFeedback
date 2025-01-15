@@ -19,8 +19,9 @@ def Train(args):
     agent = getattr(sys.modules[__name__], args.model)(args)
     envir = getattr(sys.modules[__name__], args.envir)(args)
     for timestep in range(args.timesteps):
-        reward, risky = envir.step(agent.choose(state=envir.state()))
-        df = pd.concat(df, pd.DataFrame([[envir.name, args.descr, agent.name, args.ident, timestep, reward, risky]], columns=cols), ignore_index=True)
+        reward, risky = envir.reward(agent.choose(options=envir.options()))
+        agent.respond(reward)
+        df = pd.concat([df, pd.DataFrame([[envir.name, args.descr, agent.name, args.ident, timestep, reward, risky]], columns=cols)], ignore_index=True)
     return df
     
 
@@ -37,18 +38,24 @@ if __name__ == "__main__":
                         help="Name of the agent to use")
     #parser.add_argument("--envir", type=str, default="Immediate", choices=['Immediate', 'Clustered', 'Delayed'], help="Name of the agent to use")
 
+    parser.add_argument("--agents", type=int, default=10, help="Num Agents")
+    parser.add_argument("--timesteps", type=int, default=100, help="Num timesteps")
     args = parser.parse_args()
     
     cols = ["Environment", "Description", "Name", "Agent ID", "Timestep", "Reward", "Risky"]
     df = pd.DataFrame([], columns=cols)
 
-    for ident in tqdm.tqdm(range(1000)):
-        for envir in ['Immediate', 'Clustered', 'Delayed']:
+    for ident in tqdm.tqdm(range(args.agents)):
+        #for envir in ['Immediate', 'Clustered', 'Delayed']:
+        for envir in ['Immediate']:
             for descr in [True, False]:
                 args.envir = envir 
                 args.descr = descr
                 args.ident = ident
-                df = pd.concat(df, Train(args), ignore_index=True)
+                df = pd.concat([df, Train(args)], ignore_index=True)
+    
+    print(df)
+
     if(args.trace):
         df.to_pickle("./ModelTracing/Results.pkl")
     else:

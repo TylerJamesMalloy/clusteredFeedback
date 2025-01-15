@@ -1,6 +1,4 @@
-from . import Bandit 
-
-class TSAgent(Bandit):
+class TSAgent():
     def choose(self,options):
         print(options)
     
