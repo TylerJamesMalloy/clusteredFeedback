@@ -20,6 +20,6 @@ class Delayed():
         if(self.ts % self.args.window == 0):
             return (self.rewardSum, risky)
         else:
-            self.rewardSum += 4 if action == "A" else np.random.choice([0,10], 1, p=[0.5, 0.5])[0] 
+            self.rewardSum += 4 if action == "A" else int(np.random.choice([0,10], 1, p=[0.5, 0.5])[0]) 
             return (None, risky) 
     
