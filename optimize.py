@@ -121,7 +121,7 @@ if __name__ == "__main__":
     bestIndex = np.argmin(errors)
     best = params[bestIndex]
     df = best['df']
-    df.to_pickle("./Simulations/optimized.pkl")
+    df.to_pickle("./Simulations/HIBL_optimized.pkl")
 
     df_means = df.groupby(['Description', 'Environment'], as_index=False)['Risky'].mean()
     guess = [
@@ -140,7 +140,7 @@ if __name__ == "__main__":
     for param in params:
         param['df'] = 0
 
-    with open('output.txt', 'w') as f:
+    with open('HIBL_output.txt', 'w') as f:
         print(params, file=f)
     print("Best parameters: ", best)
     sns.barplot(data=df, x="Environment", y="Risky", hue="Description", hue_order=["No Description", "Description"], palette=palette)
