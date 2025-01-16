@@ -36,15 +36,21 @@ if __name__ == "__main__":
     parser.add_argument("--window", type=int, default=10, help="Feedback window size")
     parser.add_argument("--risky", type=list, default=[[0,10],[0.5,0.5]], help="Probabilities for risky option (B).")
     parser.add_argument("--sure", type=int, default=4, help="Value of the sure option (A).")
-    parser.add_argument("--pretrainNo", type=int, default=50, help="Pretraining steps for description environment.")
-    parser.add_argument("--pretrainDesc", type=int, default=75, help="Pretraining steps for description environment.")
+    parser.add_argument("--pretrainNo", type=int, default=0, help="Pretraining steps for description environment.")
+    parser.add_argument("--pretrainDesc", type=int, default=200, help="Pretraining steps for description environment.")
     parser.add_argument("--noise", type=float, default=0.25, help="IBL noise parameter")
+    parser.add_argument("--decay", type=float, default=0.5, help="IBL noise parameter")
+    parser.add_argument("--temperature", type=float, default=0.35, help="IBL noise parameter")
     parser.add_argument("--timesteps", type=int, default=100, help="Num timesteps")
     args = parser.parse_args()
+
+    #DEFAULT_NOISE = 0.25
+    #DEFAULT_DECAY = 0.5
+    #DEFAULT_TEMPERATURE = np.sqrt(2) * 0.25
     
     cols = ["Environment", "Description", "Name", "Agent ID", "Timestep", "Reward", "Risky"]
     df = pd.DataFrame([], columns=cols)
-    models = ["IBLAgent"]
+    models = ["HIBLAgent"]
     envirs = ['Immediate', 'Delayed', 'Clustered']
     descrs = ["Description", "No Description"]
 

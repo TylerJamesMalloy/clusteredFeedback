@@ -1,6 +1,10 @@
 from pyibl import Agent, DelayedResponse
 import numpy as np 
 
+"""
+Best guess:  [0.307, 0.673, 0.546, 0.694, 0.569, 0.718]
+Best parameters:  {'model': 'IBLAgent', 'pretrainNo': 0, 'pretrainDesc': 25, 'noise': 0.2, 'temperature': 0.5, 'decay': 0.1, 'error': np.float64(0.022615), 'df': 0}
+"""
 class IBLAgent():
     def __init__(self, args):
         self.args = args
