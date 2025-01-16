@@ -2,6 +2,7 @@ from pyibl import Agent, DelayedResponse
 import numpy as np 
 """
 Best guess:  [0.358, 0.691, 0.573, 0.625, 0.64, 0.771]
+true =       [0.40,  0.75,   0.60, 0.75,  0.60, 0.75]
 Best parameters:  {'model': 'IBLAgent', 'pretrainNo': 0, 'pretrainDesc': 100, 'noise': 0.2, 'temperature': 0.5, 'decay': 0.3, 'error': np.float64(0.023640000000000015), 'df': 0}
 """
 
@@ -10,8 +11,8 @@ class HIBLAgent():
         self.args = args
         self.a = Agent(name='Agent', default_utility=4.5, noise=self.args.noise, temperature=self.args.temperature, decay=self.args.decay)
         
-        self.a1 = Agent(name='A', default_utility=0, decay=0, noise=0, temperature=10)
-        self.a2 = Agent(name='B', default_utility=10, decay=0.5, noise=1, temperature=0.1)
+        self.a1 = Agent(name='A', default_utility=4, decay=0, noise=0, temperature=0.1)
+        self.a2 = Agent(name='B', default_utility=10, decay=1, noise=1, temperature=10)
         
         self.agents = [self.a1, self.a2]
         self.detailHistory = []

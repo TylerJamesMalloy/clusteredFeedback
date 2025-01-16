@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
     parser.add_argument("--dataPath", type=str, default="/HumanBehavior/study1.csv", help="Path to human decisions.")
     parser.add_argument("--trace", type=bool, default=False, help="Whether or not to trace the human decisions in dataPath")
-    parser.add_argument("--agents", type=int, default=10, help="Num Agents")
+    parser.add_argument("--agents", type=int, default=100, help="Num Agents")
     parser.add_argument("--window", type=int, default=10, help="Feedback window size")
     parser.add_argument("--risky", type=list, default=[[0,10],[0.5,0.5]], help="Probabilities for risky option (B).")
     parser.add_argument("--sure", type=int, default=4, help="Value of the sure option (A).")
@@ -91,12 +91,12 @@ if __name__ == "__main__":
     df = pd.DataFrame([], columns=cols)
 
     #tqdm.tqdm()
-    models = ["IBLAgent"]
+    models = ["HIBLAgent"]
     pretrainNos = [0]
-    pretrainDescs = [0, 25, 50, 75, 100]
-    noises = [0.1, 0.2, 0.3, 0.4, 0.5]
-    temperatures = [0.1, 0.2, 0.3, 0.4, 0.5]
-    decays = [0.1, 0.2, 0.3, 0.4, 0.5]
+    pretrainDescs = [100]
+    noises = [0.1]
+    temperatures = [0.55, 0.6, 0.7]
+    decays = [0.5]
     params = []
     pbar = tqdm.tqdm(total=(len(models) * len(pretrainNos) * len(pretrainDescs) * len(noises) * len(temperatures) * len(decays)))
     for model in models:
@@ -105,12 +105,12 @@ if __name__ == "__main__":
                 for noise in noises:
                     for temperature in temperatures:
                         for decay in decays:
-                            param = {"model":"IBLAgent", 
-                                           "pretrainNo": pretrainNo, 
-                                           "pretrainDesc":pretrainDesc, 
-                                           "noise":noise, 
-                                           "temperature":temperature, 
-                                           "decay":decay}
+                            param = {   "model":model, 
+                                        "pretrainNo": pretrainNo, 
+                                        "pretrainDesc":pretrainDesc, 
+                                        "noise":noise, 
+                                        "temperature":temperature, 
+                                        "decay":decay}
                             error, df = Optimize(param=param, args=args)
                             param['error'] = error
                             param['df'] = df
@@ -121,7 +121,7 @@ if __name__ == "__main__":
     bestIndex = np.argmin(errors)
     best = params[bestIndex]
     df = best['df']
-    df.to_pickle("./Simulations/HIBL_optimized.pkl")
+    df.to_pickle("./Simulations/HIBL_optimized_v2.pkl")
 
     df_means = df.groupby(['Description', 'Environment'], as_index=False)['Risky'].mean()
     guess = [
@@ -140,7 +140,7 @@ if __name__ == "__main__":
     for param in params:
         param['df'] = 0
 
-    with open('HIBL_output.txt', 'w') as f:
+    with open('HIBL_output_v2.txt', 'w') as f:
         print(params, file=f)
     print("Best parameters: ", best)
     sns.barplot(data=df, x="Environment", y="Risky", hue="Description", hue_order=["No Description", "Description"], palette=palette)
