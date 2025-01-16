@@ -52,8 +52,12 @@ def Optimize(param, args):
     ]"""
     #[Immediate No, Immediate Yes, Blocked No, Blocked Yes, Delayed No, Delayed Yes]
     #true = [0.388290, 0.515006, 0.53330, 0.523719, 0.516883, 0.547415]
-    true = [0.40, 0.75, 0.60, 0.75, 0.60, 0.75]
+    true = [0.42, 0.74, 0.58, 0.76, 0.54, 0.77]
     #true = [0.42, 0.74]
+    """
+    Best guess:  [0.4277, 0.7631, 0.5126, 0.7929, 0.5339, 0.7661]
+Best parameters:  {'model': 'HIBLAgent', 'pretrainNo': 0, 'pretrainDesc': 100, 'noise': 0.125, 'temperature': 0.575, 'decay': 0.5, 'error': np.float64(0.006270490000000006), 'df': 0}
+    """
     return np.sum((np.array(true) - np.array(guess)) ** 2), df
 
 def Train(args):
@@ -94,9 +98,9 @@ if __name__ == "__main__":
     models = ["HIBLAgent"]
     pretrainNos = [0]
     pretrainDescs = [100]
-    noises = [0.1]
-    temperatures = [0.55, 0.6, 0.7]
-    decays = [0.5]
+    noises = [0.075, 0.1, 0.125]
+    temperatures = [0.575, 0.6, 0.625]
+    decays = [0.475, 0.5, 0.525]
     params = []
     pbar = tqdm.tqdm(total=(len(models) * len(pretrainNos) * len(pretrainDescs) * len(noises) * len(temperatures) * len(decays)))
     for model in models:
@@ -121,7 +125,7 @@ if __name__ == "__main__":
     bestIndex = np.argmin(errors)
     best = params[bestIndex]
     df = best['df']
-    df.to_pickle("./Simulations/HIBL_optimized_v2.pkl")
+    df.to_pickle("./Simulations/HIBL_optimized_v3.pkl")
 
     df_means = df.groupby(['Description', 'Environment'], as_index=False)['Risky'].mean()
     guess = [
@@ -140,7 +144,7 @@ if __name__ == "__main__":
     for param in params:
         param['df'] = 0
 
-    with open('HIBL_output_v2.txt', 'w') as f:
+    with open('HIBL_output_v3.txt', 'w') as f:
         print(params, file=f)
     print("Best parameters: ", best)
     sns.barplot(data=df, x="Environment", y="Risky", hue="Description", hue_order=["No Description", "Description"], palette=palette)
