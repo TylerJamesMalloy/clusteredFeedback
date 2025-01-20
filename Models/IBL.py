@@ -28,6 +28,34 @@ class IBLAgent():
     def choose(self,options):
         return self.a.choose(options)
     
+    def modelTrace(self, observedReward, modelRisky, humanRisky, humanReward):
+        _, options, decisions, values = self.a._pending_decision
+        humanChoice = 0 if humanRisky else 1
+        self.a._pending_decision = (humanChoice, options, decisions, values)
+
+        if(self.args.envir == "Immediate"):
+            self.a.respond(humanReward)
+        elif(self.args.envir == "Delayed"):
+            if(observedReward == None):
+                self.delayedResponses.append(self.a.respond())
+            else:
+                self.delayedResponses.append(self.a.respond())
+                for delayedResponse in self.delayedResponses:
+                    delayedReward = (observedReward/self.args.window) #+ np.random.normal(0,0.1)
+                    delayedResponse.update(delayedReward)
+                self.delayedResponses = []
+        elif(self.args.envir == "Clustered"):
+            if(observedReward == None):
+                self.delayedResponses.append(self.a.respond())
+            else:
+                self.delayedResponses.append(self.a.respond())
+                for delayedResponse, outcome in zip(self.delayedResponses, observedReward):
+                    delayedResponse.update(outcome)
+                self.delayedResponses = []
+        else:
+            print("Environment not recognized in IBL Agent")
+            assert(False)
+    
     def respond(self,reward):
         if(self.args.envir == "Immediate"):
             self.a.respond(reward)

@@ -18,8 +18,11 @@ class Clustered():
     def reward(self,action):
         risky = False if action == "A" else True
         if(self.ts % self.args.window == 0):
-            return (self.rewardHistory, risky)
+            true_reward = 4 if action == "A" else int(np.random.choice([0,10], 1, p=[0.5, 0.5])[0])
+            self.rewardHistory.append(true_reward)
+            return (self.rewardHistory, true_reward, risky)
         else:
-            self.rewardHistory.append(4 if action == "A" else int(np.random.choice([0,10], 1, p=[0.5, 0.5])[0]))
-            return (None, risky) 
+            true_reward = 4 if action == "A" else int(np.random.choice([0,10], 1, p=[0.5, 0.5])[0])
+            self.rewardHistory.append(true_reward)
+            return (None, true_reward, risky) 
     

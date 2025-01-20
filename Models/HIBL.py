@@ -49,6 +49,51 @@ class HIBLAgent():
         self.choice = choice 
         return choice
     
+    def modelTrace(self, observedReward, modelRisky, humanRisky, humanReward):
+        _, options, decisions, values = self.a._pending_decision
+        humanChoice = 0 if humanRisky else 1
+        self.a._pending_decision = (humanChoice, options, decisions, values)
+
+        if(self.args.envir == "Immediate"):
+            self.a.respond(humanReward)
+            for agent in self.agents:
+                if(self.chosen._pending_decision is not None):
+                    agent._pending_decision = tuple((self.chosen._pending_decision[1].index(self.choice), self.chosen._pending_decision[1], self.chosen._pending_decision[2], self.chosen._pending_decision[3]))
+                    agent.respond(humanReward)
+        elif(self.args.envir == "Delayed"):
+            if(self.chosen == self.agents[1]):
+                self.agents[0]._pending_decision = tuple((self.chosen._pending_decision[1].index(self.choice), self.chosen._pending_decision[1], self.chosen._pending_decision[2], self.chosen._pending_decision[3]))
+            else:
+                self.agents[1]._pending_decision = tuple((self.chosen._pending_decision[1].index(self.choice), self.chosen._pending_decision[1], self.chosen._pending_decision[2], self.chosen._pending_decision[3]))
+                
+            if(observedReward == None):
+                self.delayedResponses.append([self.a.respond(), self.agents[0].respond(), self.agents[1].respond()])
+            else:
+                self.delayedResponses.append([self.a.respond(), self.agents[0].respond(), self.agents[1].respond()])
+                for delayedResponse in self.delayedResponses:
+                    for response in delayedResponse:
+                        delayedReward = (observedReward/self.args.window) #+ np.random.normal(0,0.1)
+                        response.update(delayedReward)
+                self.delayedResponses = []
+        elif(self.args.envir == "Clustered"):
+            if(self.chosen == self.agents[1]):
+                self.agents[0]._pending_decision = tuple((self.chosen._pending_decision[1].index(self.choice), self.chosen._pending_decision[1], self.chosen._pending_decision[2], self.chosen._pending_decision[3]))
+            else:
+                self.agents[1]._pending_decision = tuple((self.chosen._pending_decision[1].index(self.choice), self.chosen._pending_decision[1], self.chosen._pending_decision[2], self.chosen._pending_decision[3]))
+                
+            if(observedReward == None):
+                self.delayedResponses.append([self.a.respond(), self.agents[0].respond(), self.agents[1].respond()])
+            else:
+                self.delayedResponses.append([self.a.respond(), self.agents[0].respond(), self.agents[1].respond()])
+                for delayedResponse in self.delayedResponses:
+                    for r, response in zip(observedReward, delayedResponse):
+                        delayedReward = (r) #+ np.random.normal(0,0.1)
+                        response.update(delayedReward)
+                self.delayedResponses = []
+        else:
+            print("Environment not recognized in HIBL model")
+            assert(False)
+
     def respond(self, reward, humanChoice=None):
         if(self.args.envir == "Immediate"):
             self.a.respond(reward)

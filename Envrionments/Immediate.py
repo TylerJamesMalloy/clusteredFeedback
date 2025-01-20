@@ -15,6 +15,7 @@ class Immediate():
         return ["A", "B"]
     
     def reward(self,action):
-        return (4, False) if action == "A" else (int(np.random.choice([0,10], 1, p=[0.5, 0.5])[0]), True)
+        true_reward = int(np.random.choice([0,10], 1, p=[0.5, 0.5])[0])
+        return (4, 4, False) if action == "A" else (true_reward, true_reward, True)
          
     
