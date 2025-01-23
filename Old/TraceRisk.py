@@ -7,17 +7,27 @@ import numpy as np
 from scipy.stats import norm
 from scipy.optimize import curve_fit
 
-df = pd.read_pickle("./Results/ModelTracing.pkl")
+df  = pd.read_pickle("./Results/TracingRiskReward.pkl")
+hdf = pd.read_pickle("./Results/RiskReward.pkl")
 """
 Index(['Environment', 'Description', 'Name', 'Agent ID', 'Timestep',
        'True Reward', 'Observed Reward', 'Correct Prediction', 'Model Risky',
        'Human Risky', 'Human Reward', 'HIBL'],
       dtype='object')
 """
+print(df.columns)
 
-df['Lucky'] = None
-df['Unlucky'] = None
-df.loc[df['True Reward'] == 0, 'Unlucky'] = 1
+desc = df[df['Description'] == 'Description']
+low  = desc[desc['Round N-1 Luck'] < 4]
+group = low.groupby(['Name'],as_index=False)['Round N Risk'].mean()
+print(group)
+
+hdesc = hdf[hdf['Description'] == 'Description']
+hlow = hdesc[hdesc['Round N-1 Luck'] < 4]
+hgroup = hlow.groupby(['Name'],as_index=False)['Round N Risk'].mean()
+print(hgroup)
+
+"""df.loc[df['True Reward'] == 0, 'Unlucky'] = 1
 df.loc[df['True Reward'] == 10, 'Unlucky'] = 0
 df.loc[df['True Reward'] == 10, 'Lucky'] = 1
 df.loc[df['True Reward'] == 0, 'Lucky'] = 0
@@ -43,4 +53,4 @@ imm = group[group['Environment'] == "Clustered"]
 imm = imm[imm['Name'] == "HIBL"]
 print("Clustered")
 print(imm[imm['Lucky'] < 1/3]['Model Risky'].mean())
-print(imm[imm['Lucky'] > 2/3]['Model Risky'].mean())
+print(imm[imm['Lucky'] > 2/3]['Model Risky'].mean())"""
