@@ -9,8 +9,8 @@ fix, ax = plt.subplots(nrows=1, ncols=1, figsize=(6, 4) )
 sns.barplot(des[des['Experiment'] == "Experiment 1"], x='Name', y="Accuracy", hue="Environment", hue_order=["Immediate", "Clustered", "Aggregated"], ci=None)
 #sns.barplot(des[des['Experiment'] == "Experiment 2"], x='Name', y="Gap", hue="Environment", hue_order=["Immediate", "Clustered", "Aggregated"], ax=axes[1])
 
-ax.set_title("Model Tracing Accuracy By Feedback Type", fontsize=18)
-ax.set_ylabel("Model Tracing Accuracy", fontsize=16)
+ax.set_title("Model Tracing Percent Accuracy \n By Feedback and Model Type", fontsize=18)
+ax.set_ylabel("Percent Accuracy in\nChoice Selection Prediction", fontsize=16)
 
 ax.set_ylim(50,100)
 ax.set_xlabel("Model Type", fontsize=16)
