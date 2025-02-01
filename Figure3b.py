@@ -10,8 +10,8 @@ fix, ax = plt.subplots(nrows=1, ncols=1, figsize=(6, 4) )
 
 sns.barplot(des[des['Experiment'] == "Experiment 2"], x='Name', y="Gap", hue="Environment", hue_order=["Immediate", "Clustered", "Aggregated"])
 
-ax.set_title("Description-Experience Gap\nAfter Lucky Blocks", fontsize=18)
-ax.set_ylabel("Description-Experience\nRisky Choice Selection Difference", fontsize=16)
+ax.set_title("RDEG Risky Choice Selection\nDifference After Lucky Blocks", fontsize=18)
+ax.set_ylabel("Repeated Description-Experience Gap\nRisky Choice Selection Difference", fontsize=14)
 ax.set_xlabel("Human Participants or Model Type", fontsize=16)
 plt.legend(title='Type of Feedback')
 plt.xticks(fontsize=14)

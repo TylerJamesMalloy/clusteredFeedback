@@ -1,82 +1,81 @@
-
-import os 
-import glob 
-import warnings
-warnings.simplefilter(action='ignore', category=FutureWarning)
-warnings.simplefilter(action='ignore', category=UserWarning)
-
 import matplotlib.pyplot as plt
 import seaborn as sns 
 import pandas as pd 
 import numpy as np
-# 69.4
-# 62.5 
-  
-fig, axes = plt.subplots(nrows=1, ncols=4, sharex=True, sharey=True, figsize=(15, 5))
 
-df = pd.read_pickle("./Results/ModelTracing.pkl")
+Data = pd.read_pickle("./Results/Simulations.pkl")
+columns = ['Environment', 'Description', 'Name', 'Agent ID', 'Lucky Gap', 'Unlucky Gap', 'Safe Gap', 'Risky Gap']
+bdf = pd.DataFrame([], columns=columns)
 
-group = df.groupby(['Environment', 'Description', 'Name', 'Agent ID'], as_index=False)["Correct Prediction"].mean()
-dec = group[group['Description'] == "Description"]
-noDec = group[group['Description'] == "No Description"]
+for Environment in Data['Environment'].unique():
+    EnvironmentData = Data[Data['Environment'] == Environment]
+    DescriptionRiskAfterLucky = []
+    ExperienceRiskAfterLucky  = []
+    DescriptionRiskAfterUnlucky = []
+    ExperienceRiskAfterUnlucky  = []
+    DescriptionRiskAfterSafe = []
+    ExperienceRiskAfterSafe  = []
+    DescriptionRiskAfterUnsafe = []
+    ExperienceRiskAfterUnsafe  = []
 
-sns.barplot(data=dec  , x="Environment", y="Correct Prediction", hue="Name", ax=axes[0], order=['Immediate', 
-'Clustered', 'Delayed'])
-sns.barplot(data=noDec, x="Environment", y="Correct Prediction", hue="Name", ax=axes[1], order=['Immediate', 
-'Clustered', 'Delayed'])
+    for Description in EnvironmentData['Description'].unique():
+        DescriptionData = EnvironmentData[EnvironmentData['Description'] == Description]
+        for Name in DescriptionData['Name'].unique():
+            NameData = DescriptionData[DescriptionData['Name'] == Name]
+            LuckyGaps = [] 
+            UnluckyGaps = [] 
+            SafeGaps = [] 
+            RiskyGaps = [] 
 
-axes[0].set_ylabel("Percentage", fontsize=16)
+            for AgentID in NameData['Agent ID'].unique():
+                AgentData = NameData[NameData['Agent ID'] == AgentID]
+                prevBlockLucky = None 
+                prevBlockUnlucky  = None 
+                prevBlockSafe = None 
+                prevBlockRisky = None 
+
+                for Block, Range in enumerate([[0,9],[10,19],[20,29],[30,39],[40,49],[50,59],[60,69],[70,79],[80,89],[90,99]]):
+                    BlockData = AgentData[(AgentData['Timestep'] > Range[0]) & (AgentData['Timestep'] < Range[1])]
+                    BlockLucky = BlockData['Lucky'].sum()
+                    BlockUnlucky = BlockData['Unlucky'].sum()
+                    BlockSafe = 10 - BlockData['Risky'].sum()
+                    BlockRisky = BlockData['Risky'].sum()
+                    
+                    if(prevBlockLucky is not None):
+                        if(prevBlockLucky >= 6):
+                            print(prevBlockLucky)
+
+                            assert(False)
+                    
+                    prevBlockLucky = BlockLucky
+                    prevBlockUnlucky = BlockUnlucky
+                    prevBlockSafe = BlockSafe
+                    prevBlockRisky = BlockRisky
 
 
+    DescriptionRiskAfterLucky = np.mean(DescriptionRiskAfterLucky)
+    ExperienceRiskAfterLucky  = np.mean(ExperienceRiskAfterLucky)
+    DescriptionRiskAfterUnlucky = np.mean(DescriptionRiskAfterUnlucky)
+    ExperienceRiskAfterUnlucky  = np.mean(ExperienceRiskAfterUnlucky)
+    DescriptionRiskAfterSafe = np.mean(DescriptionRiskAfterSafe)
+    ExperienceRiskAfterSafe  = np.mean(ExperienceRiskAfterSafe)
+    DescriptionRiskAfterUnsafe = np.mean(DescriptionRiskAfterUnsafe)
+    ExperienceRiskAfterUnsafe  = np.mean(ExperienceRiskAfterUnsafe)
 
-axes[1].legend().remove()
-axes[2].legend().remove()
+assert(False)
+fix, axes = plt.subplots(nrows=1, ncols=2, sharey=True)
 
-df  = pd.read_pickle("./Results/TracingRiskReward.pkl")
-hdf = pd.read_pickle("./Results/RiskReward.pkl")
-df['Round N Risk'] = df['Round N Risk'] / 10
-hdf['Round N Risk'] = hdf['Round N Risk'] / 10
 
-low  = df[df['Round N-1 Luck'] <= 4]
-group = low.groupby(['Name', 'Description', "Environment"],as_index=False)['Round N Risk'].mean()
-high = df[df['Round N-1 Luck'] >= 6]
-group.loc[group['Name'] == "IBL", "Name"] = "Temp"
-group.loc[group['Name'] == "HIBL", "Name"] = "IBL"
-group.loc[group['Name'] == "Temp", "Name"] = "HIBL"
-group['Lucky Risk'] = high.groupby(['Name', 'Description', "Environment"],as_index=False)['Round N Risk'].mean()['Round N Risk']
+sns.barplot(des[des['Experiment'] == "Experiment 1"], x='Name', y="Gap", hue="Environment", hue_order=["Immediate", "Clustered", "Aggregated"], ax=axes[0])
+sns.barplot(des[des['Experiment'] == "Experiment 2"], x='Name', y="Gap", hue="Environment", hue_order=["Immediate", "Clustered", "Aggregated"], ax=axes[1])
 
-hlow = hdf[hdf['Round N-1 Luck'] <= 4]
-hgroup = hlow.groupby(['Name', 'Description', "Environment"],as_index=False)['Round N Risk'].mean()
-hhigh = hdf[hdf['Round N-1 Luck'] >= 6]
-hgroup['Lucky Risk'] = hhigh.groupby(['Name', 'Description', "Environment"],as_index=False)['Round N Risk'].mean()['Round N Risk']
-hgroup = hgroup[hgroup['Name'] == "Human"]
-group = pd.concat([group, hgroup])
+axes[0].set_title("Description-Experience Gap \n by Timing of Feedback")
+axes[1].set_title("Description-Experience Gap \n After Lucky Blocks")
+axes[0].set_ylabel("Description-Experience Gap", fontsize=14)
 
-group.loc[(group['Description'] == "Description") & (group['Environment'] == "Clustered") & (group['Name'] == "HIBL"), "Lucky Risk"] = 0.922
-group.loc[(group['Description'] == "Description") & (group['Environment'] == "Delayed") & (group['Name'] == "HIBL"), "Lucky Risk"] = 0.91
-
-sns.barplot(group[group["Description"] == "Description"], y='Lucky Risk', x="Environment", hue="Name", order=['Immediate', 
-'Clustered', 'Delayed'], ax=axes[2])
-sns.barplot(group[group["Description"] == "No Description"], y='Lucky Risk', x="Environment", hue="Name", order=['Immediate', 
-'Clustered', 'Delayed'],  ax=axes[3])
-
-axes[0].set_title("Correct Prediction \n With Description", fontsize=16)
-axes[1].set_title("Correct Prediction \n No Description", fontsize=16)
-axes[2].set_title("Risky Choice With Description \n After Lucky Block", fontsize=16)
-axes[3].set_title("Risky Choice No Description \n After Lucky Block", fontsize=16)
-
-axes[0].set_xlabel("Type of Feedback", fontsize=16)
-axes[1].set_xlabel("Type of Feedback", fontsize=16)
-axes[2].set_xlabel("Type of Feedback", fontsize=16)
-axes[3].set_xlabel("Type of Feedback", fontsize=16)
+axes[0].set_xlabel("Model Type", fontsize=14)
+axes[1].set_xlabel("Model Type", fontsize=14)
 
 axes[0].legend().remove()
-axes[1].legend().remove()
-axes[2].legend().remove()
-
-plt.subplots_adjust(left=0.05, bottom=0.095, right=0.995, top=0.89, wspace=0, hspace=0)
-sns.move_legend(axes[3], "lower right")
 
 plt.show()
-      
-
